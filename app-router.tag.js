@@ -5,6 +5,7 @@ window.customElements.define('app-router', class extends HTMLElement {
             this.querySelectorAll('[route]').forEach(node => node.hidden = true);
             this.checkHash();
         });
+        this.lastQueryString = {};
         // setTimeout(e=>this.checkHash(),100);
     }
     checkHash() {
@@ -14,6 +15,11 @@ window.customElements.define('app-router', class extends HTMLElement {
             let kv = pair.split('=');
             queryString[kv[0]] = kv[1];
         }
+        let queryStringUpdate = {};
+        for(let key in queryString)
+            queryStringUpdate[key] = queryString[key] != this.lastQueryString[key];
+        this.lastQueryString = queryString;
+        
         // console.log('query-string',queryString);
         let routes = this.querySelectorAll('[route]');
         // console.log('children',routes, this.innerHTML);
@@ -25,7 +31,7 @@ window.customElements.define('app-router', class extends HTMLElement {
             if (match)// && route.hidden==true)
                 // if (route.hasAttribute('call'))
                     if(route.routeChange) 
-                        route.routeChange({ base: match[0], wakeup: route.hidden, queryString: queryString }, ...match.slice(1));
+                        route.routeChange({ base: match[0], wakeup: route.hidden, queryString: queryString, queryStringUpdate: queryStringUpdate }, ...match.slice(1));
             // route[route.getAttribute('call')](...match.slice(1));
             // if (match)
             //     for (let j = 1; j < match.length; j++)
